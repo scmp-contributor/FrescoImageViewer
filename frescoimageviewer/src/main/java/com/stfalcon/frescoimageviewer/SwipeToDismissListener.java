@@ -88,6 +88,7 @@ class SwipeToDismissListener implements View.OnTouchListener {
         }
 
         final boolean isDismissed = animateTo != 0.0f;
+        if (isDismissed) callDismissListener();
         ObjectAnimator animator = ObjectAnimator.ofFloat(
                 swipeView, PROPERTY_TRANSLATION_X, currentPosition, animateTo);
 
@@ -98,7 +99,7 @@ class SwipeToDismissListener implements View.OnTouchListener {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
-                        if (isDismissed) callDismissListener();
+                        //if (isDismissed) callDismissListener();
                     }
                 });
         animator.addUpdateListener(
