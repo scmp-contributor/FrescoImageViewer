@@ -94,10 +94,10 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
      */
     @Override
     public void onDismiss() {
-        dialog.cancel();
         if (builder.onDismissListener != null) {
             builder.onDismissListener.onDismiss();
         }
+        dialog.cancel();
     }
 
     /**
@@ -111,6 +111,9 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
             if (viewer.isScaled()) {
                 viewer.resetScale();
             } else {
+                if (builder.onDismissListener != null) {
+                    builder.onDismissListener.onDismiss();
+                }
                 dialog.cancel();
             }
         }
