@@ -1,5 +1,6 @@
 package com.stfalcon.frescoimageviewersample.ui.activities;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -59,9 +60,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void showPicker(int startPosition) {
         overlayView = new ImageOverlayView(this);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         new ImageViewer.Builder(MainActivity.this, posters)
                 .setStartPosition(startPosition)
                 //.hideStatusBar(false)
+                .isCircular(true) // default is false - no circular
                 .setImageMargin(this, R.dimen.image_margin)
                 .setImageChangeListener(getImageChangeListener())
                 .setOnDismissListener(getDisissListener())
@@ -74,9 +77,10 @@ public class MainActivity extends AppCompatActivity {
         return new ImageViewer.OnImageChangeListener() {
             @Override
             public void onImageChange(int position) {
-                String url = posters[position];
+                int actualPosition = position % posters.length;
+                String url = posters[actualPosition];
                 overlayView.setShareText(url);
-                overlayView.setDescription(descriptions[position]);
+                overlayView.setDescription(descriptions[actualPosition]);
             }
         };
     }
@@ -85,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         return new ImageViewer.OnDismissListener() {
             @Override
             public void onDismiss() {
-                
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
         };
     }

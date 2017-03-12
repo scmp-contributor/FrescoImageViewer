@@ -72,9 +72,9 @@ class ImageViewerView extends RelativeLayout
         init();
     }
 
-    public void setUrls(List<String> urls, int startPosition) {
+    public void setUrls(List<String> urls, int startPosition, boolean isCircular) {
         adapter = new ImageViewerAdapter(
-                getContext(), urls, customDraweeHierarchyBuilder);
+                getContext(), urls, customDraweeHierarchyBuilder, isCircular);
         pager.setAdapter(adapter);
         setStartPosition(startPosition);
     }
@@ -202,7 +202,9 @@ class ImageViewerView extends RelativeLayout
     }
 
     private void setStartPosition(int position) {
-        pager.setCurrentItem(position);
+        /** make sure the position is in the center of the huge list */
+        int startIndex = adapter.isCircular() ? position + (adapter.getCount() / 2) - (adapter.getCount() / 2) % adapter.getImagesCount() : position;
+        pager.setCurrentItem(startIndex);
     }
 
     private void onUpDownEvent(MotionEvent event) {

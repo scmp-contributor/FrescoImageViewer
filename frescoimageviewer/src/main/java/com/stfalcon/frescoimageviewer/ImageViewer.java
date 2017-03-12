@@ -69,7 +69,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
     private void createDialog() {
         viewer = new ImageViewerView(builder.context);
         viewer.setCustomDraweeHierarchyBuilder(builder.customHierarchyBuilder);
-        viewer.setUrls(builder.urls, builder.startPosition);
+        viewer.setUrls(builder.urls, builder.startPosition, builder.isCircular);
         viewer.setOnDismissListener(this);
         viewer.setBackgroundColor(builder.backgroundColor);
         viewer.setOverlayView(builder.overlayView);
@@ -155,7 +155,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         private int imageMarginPixels;
         private GenericDraweeHierarchyBuilder customHierarchyBuilder;
         private boolean shouldStatusBarHide = true;
-
+        private boolean isCircular = false;
         /**
          * Constructor using a context and images urls array for this builder and the {@link ImageViewer} it creates.
          */
@@ -248,6 +248,16 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
          */
         public Builder hideStatusBar(boolean shouldHide) {
             this.shouldStatusBarHide = shouldHide;
+            return this;
+        }
+
+        /**
+         * Set the image viewer is circular paging. By default is false.
+         *
+         * @return This Builder object to allow for chaining of calls to set methods
+         */
+        public Builder isCircular(boolean isCircular) {
+            this.isCircular = isCircular;
             return this;
         }
 

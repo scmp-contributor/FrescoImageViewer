@@ -29,13 +29,16 @@ public class ImageViewerAdapter
     private List<String> urls;
     private HashSet<ImageViewHolder> holders;
     private GenericDraweeHierarchyBuilder hierarchyBuilder;
+    private boolean isCircular = false;
 
     public ImageViewerAdapter(Context context, List<String> urls,
-                              GenericDraweeHierarchyBuilder hierarchyBuilder) {
+                              GenericDraweeHierarchyBuilder hierarchyBuilder,
+                              boolean isCircular) {
         this.context = context;
         this.urls = urls;
         this.holders = new HashSet<>();
         this.hierarchyBuilder = hierarchyBuilder;
+        this.isCircular = isCircular;
     }
 
     @Override
@@ -52,7 +55,7 @@ public class ImageViewerAdapter
 
     @Override
     public int getItemCount() {
-        return urls.size();
+        return urls.size() <= 1 || !isCircular ? urls.size() : 5000;
     }
 
 
@@ -74,8 +77,16 @@ public class ImageViewerAdapter
         }
     }
 
+    public boolean isCircular() {
+        return this.isCircular;
+    }
+
+    public int getImagesCount() {
+        return urls.size();
+    }
+
     public String getUrl(int index) {
-        return urls.get(index);
+        return urls.get(isCircular ? index % urls.size() : index);
     }
 
     private BaseControllerListener<ImageInfo>
@@ -107,7 +118,7 @@ public class ImageViewerAdapter
             this.position = position;
 
             tryToSetHierarchy();
-            setController(urls.get(position));
+            setController(urls.get(isCircular ? position % urls.size() : position));
 
             drawee.setOnScaleChangeListener(this);
         }
