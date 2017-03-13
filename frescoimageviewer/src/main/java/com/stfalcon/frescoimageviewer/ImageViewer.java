@@ -56,6 +56,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
      */
     public void show() {
         if (!builder.urls.isEmpty()) {
+            dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimations_Fade;
             dialog.show();
         } else {
             Log.w(TAG, "Urls list cannot be empty! Viewer ignored.");
