@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 .isCircular(true) // default is false - no circular
                 .setImageMargin(this, R.dimen.image_margin)
                 .setImageChangeListener(getImageChangeListener())
-                .setOnDismissListener(getDisissListener())
+                .setOnDismissListener(getDismissListener())
                 .setCustomDraweeHierarchyBuilder(getHierarchyBuilder())
                 .setOverlayView(overlayView)
                 .show();
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    private ImageViewer.OnDismissListener getDisissListener() {
+    private ImageViewer.OnDismissListener getDismissListener() {
         return new ImageViewer.OnDismissListener() {
             @Override
             public void onDismiss() {

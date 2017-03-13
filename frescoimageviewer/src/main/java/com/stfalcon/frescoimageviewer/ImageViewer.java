@@ -156,6 +156,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         private GenericDraweeHierarchyBuilder customHierarchyBuilder;
         private boolean shouldStatusBarHide = true;
         private boolean isCircular = false;
+        private ImageViewer imageViewer;
         /**
          * Constructor using a context and images urls array for this builder and the {@link ImageViewer} it creates.
          */
@@ -298,9 +299,13 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
          * {@link ImageViewer#show()}'s the dialog.
          */
         public ImageViewer show() {
-            ImageViewer dialog = build();
-            dialog.show();
-            return dialog;
+            imageViewer = build();
+            imageViewer.show();
+            return imageViewer;
+        }
+
+        public void dismiss() {
+            imageViewer.onDismiss();
         }
     }
 }
