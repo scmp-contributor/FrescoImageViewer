@@ -38,6 +38,6 @@ publish {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'me.relex:photodraweeview:1.1.0'
-    provided 'com.facebook.fresco:fresco:0.12.0'
+    compile 'me.relex:photodraweeview:1.1.2'
+    provided 'com.facebook.fresco:fresco:1.1.0'
 }
