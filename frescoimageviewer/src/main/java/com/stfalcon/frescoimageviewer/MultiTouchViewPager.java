@@ -91,4 +91,9 @@ class MultiTouchViewPager extends ViewPager {
             }
         });
     }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w - this.getPageMargin(), h, oldw - this.getPageMargin(), oldh);
+    }
 }
