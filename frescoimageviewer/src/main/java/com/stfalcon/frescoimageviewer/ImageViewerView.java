@@ -72,9 +72,9 @@ class ImageViewerView extends RelativeLayout
         init();
     }
 
-    public void setUrls(List<String> urls, int startPosition, boolean isCircular) {
+    public void setUrls(List<String> urls, List<String> lqUrls, int startPosition, boolean isCircular, int blurRadius) {
         adapter = new ImageViewerAdapter(
-                getContext(), urls, customDraweeHierarchyBuilder, isCircular);
+                getContext(), urls, lqUrls, customDraweeHierarchyBuilder, isCircular, blurRadius);
         pager.setAdapter(adapter);
         setStartPosition(startPosition);
     }

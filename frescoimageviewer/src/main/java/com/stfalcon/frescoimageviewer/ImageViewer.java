@@ -70,7 +70,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
     private void createDialog() {
         viewer = new ImageViewerView(builder.context);
         viewer.setCustomDraweeHierarchyBuilder(builder.customHierarchyBuilder);
-        viewer.setUrls(builder.urls, builder.startPosition, builder.isCircular);
+        viewer.setUrls(builder.urls, builder.lqUrls, builder.startPosition, builder.isCircular, builder.lowResBlurRadius);
         viewer.setOnDismissListener(this);
         viewer.setBackgroundColor(builder.backgroundColor);
         viewer.setOverlayView(builder.overlayView);
@@ -148,8 +148,10 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
 
         private Context context;
         private List<String> urls;
+        private List<String> lqUrls;
         private @ColorInt int backgroundColor = Color.BLACK;
         private int startPosition;
+        private int lowResBlurRadius = 4;
         private OnImageChangeListener imageChangeListener;
         private OnDismissListener onDismissListener;
         private View overlayView;
@@ -158,18 +160,19 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         private boolean shouldStatusBarHide = true;
         private boolean isCircular = false;
         /**
-         * Constructor using a context and images urls array for this builder and the {@link ImageViewer} it creates.
+         * Constructor using a context, images urls array and low resolution images urls array for this builder and the {@link ImageViewer} it creates.
          */
-        public Builder(Context context, String[] urls) {
-            this(context, new ArrayList<>(Arrays.asList(urls)));
+        public Builder(Context context, String[] urls, String[] lqUrls) {
+            this(context, new ArrayList<>(Arrays.asList(urls)), new ArrayList<>(Arrays.asList(lqUrls)));
         }
 
         /**
-         * Constructor using a context and images urls list for this builder and the {@link ImageViewer} it creates.
+         * Constructor using a context, images urls list and low resolution images urls list for this builder and the {@link ImageViewer} it creates.
          */
-        public Builder(Context context, List<String> urls) {
+        public Builder(Context context, List<String> urls, List<String> lqUrls) {
             this.context = context;
             this.urls = urls;
+            this.lqUrls = lqUrls;
         }
 
         /**
@@ -239,6 +242,16 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
          */
         public Builder setImageMargin(Context context, @DimenRes int dimen) {
             this.imageMarginPixels = Math.round(context.getResources().getDimension(dimen));
+            return this;
+        }
+
+        /**
+         * Set low resolution image blur radius
+         *
+         * @return This Builder object to allow for chaining of calls to set methods
+         */
+        public Builder setLowResBlurRadius(int radius) {
+            this.lowResBlurRadius = radius;
             return this;
         }
 

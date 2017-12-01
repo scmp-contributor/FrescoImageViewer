@@ -18,7 +18,7 @@ import com.stfalcon.frescoimageviewersample.ui.views.ImageOverlayView;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private String[] posters, descriptions;
+    private String[] posters, lqPosters, descriptions;
 
     private static final int[] ids = new int[]{
             R.id.firstImage, R.id.secondImage,
@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         posters = Demo.getPosters();
+        lqPosters = Demo.getLqPosters();
         descriptions = Demo.getDescriptions();
         initViews();
     }
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private void showPicker(int startPosition) {
         overlayView = new ImageOverlayView(this);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-        new ImageViewer.Builder(MainActivity.this, posters)
+        new ImageViewer.Builder(MainActivity.this, posters, lqPosters)
                 .setStartPosition(startPosition)
                 //.hideStatusBar(false)
                 .isCircular(true) // default is false - no circular

@@ -8,6 +8,20 @@ public final class Demo {
         throw new AssertionError();
     }
 
+    public static String[] getLqPosters() {
+        return new String[]{
+                "https://pp.vk.me/c630619/v630619423/4637a/vAOodrqPzQM.jpg", // Vincent
+                "https://pp.vk.me/c630619/v630619423/46395/71QKIPW6BWM.jpg", // Jules
+                "https://pp.vk.me/c630619/v630619423/46383/GOTf1IvHKoc.jpg", // Korben
+                "https://pp.vk.me/c630619/v630619423/4638c/i1URx2fWj20.jpg", // Toretto
+                "https://pp.vk.me/c630619/v630619423/4639e/BPoHv4xEikA.jpg", // Marty
+                "https://pp.vk.me/c630619/v630619423/463a7/9EjA0oqA_yQ.jpg", // Driver
+                "https://pp.vk.me/c630619/v630619423/463b0/VLPAZQJ0kuI.jpg", // Frank
+                "https://pp.vk.me/c630619/v630619423/463b9/O3-hk8kIvdY.jpg", // Max
+                "https://pp.vk.me/c630619/v630619423/463c2/WgtvE0FQwVY.jpg"  // Daniel
+        };
+    }
+
     public static String[] getPosters() {
         return new String[]{
                 "https://pp.vk.me/c630619/v630619423/4637a/vAOodrqPzQM.jpg", // Vincent

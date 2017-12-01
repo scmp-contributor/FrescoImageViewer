@@ -2,6 +2,7 @@ package com.stfalcon.frescoimageviewer.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.Animatable;
+import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -11,12 +12,13 @@ import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.imagepipeline.image.ImageInfo;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.stfalcon.frescoimageviewer.drawee.ZoomableDraweeView;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
+import jp.wasabeef.fresco.processors.BlurPostprocessor;
 import me.relex.photodraweeview.OnScaleChangeListener;
 
 /*
@@ -27,18 +29,23 @@ public class ImageViewerAdapter
 
     private Context context;
     private List<String> urls;
+    private List<String> lqUrls;
     private HashSet<ImageViewHolder> holders;
     private GenericDraweeHierarchyBuilder hierarchyBuilder;
     private boolean isCircular = false;
+    private int blurRadius = 4;
 
-    public ImageViewerAdapter(Context context, List<String> urls,
+    public ImageViewerAdapter(Context context, List<String> urls, List<String> lqUrls,
                               GenericDraweeHierarchyBuilder hierarchyBuilder,
-                              boolean isCircular) {
+                              boolean isCircular,
+                              int blurRadius) {
         this.context = context;
         this.urls = urls;
+        this.lqUrls = lqUrls;
         this.holders = new HashSet<>();
         this.hierarchyBuilder = hierarchyBuilder;
         this.isCircular = isCircular;
+        this.blurRadius = blurRadius;
     }
 
     @Override
@@ -118,7 +125,14 @@ public class ImageViewerAdapter
             this.position = position;
 
             tryToSetHierarchy();
-            setController(urls.get(isCircular ? position % urls.size() : position));
+
+            int pos = isCircular ? position % urls.size() : position;
+
+            if (pos < lqUrls.size()) {
+                setController(urls.get(pos), lqUrls.get(pos));
+            } else {
+                setController(urls.get(pos), null);
+            }
 
             drawee.setOnScaleChangeListener(this);
         }
@@ -139,12 +153,17 @@ public class ImageViewerAdapter
             }
         }
 
-        private void setController(String url) {
+        private void setController(String url, String lqUrl) {
             PipelineDraweeControllerBuilder controllerBuilder = Fresco.newDraweeControllerBuilder();
             controllerBuilder.setUri(url);
             controllerBuilder.setAutoPlayAnimations(true);
             controllerBuilder.setOldController(drawee.getController());
             controllerBuilder.setControllerListener(getDraweeControllerListener(drawee));
+            if (lqUrl != null) {
+                ImageRequestBuilder lqRequestBuilder = ImageRequestBuilder.newBuilderWithSource(Uri.parse(lqUrl));
+                lqRequestBuilder.setPostprocessor(new BlurPostprocessor(context, blurRadius));
+                controllerBuilder.setLowResImageRequest(lqRequestBuilder.build());
+            }
             drawee.setController(controllerBuilder.build());
         }
 
