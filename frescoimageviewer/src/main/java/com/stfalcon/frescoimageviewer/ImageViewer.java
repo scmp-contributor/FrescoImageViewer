@@ -22,6 +22,7 @@ import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.StyleRes;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -83,6 +84,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
                 }
             }
         });
+        viewer.setVisibilityViewRes(builder.visibilityViewRes);
 
         dialog = new AlertDialog.Builder(builder.context, getDialogStyle())
                 .setView(viewer)
@@ -159,6 +161,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         private GenericDraweeHierarchyBuilder customHierarchyBuilder;
         private boolean shouldStatusBarHide = true;
         private boolean isCircular = false;
+        private @IdRes Integer visibilityViewRes = null;
         /**
          * Constructor using a context, images urls array and low resolution images urls array for this builder and the {@link ImageViewer} it creates.
          */
@@ -294,6 +297,17 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
          */
         public Builder setCustomDraweeHierarchyBuilder(GenericDraweeHierarchyBuilder customHierarchyBuilder) {
             this.customHierarchyBuilder = customHierarchyBuilder;
+            return this;
+        }
+
+        /**
+         * Set visibility view res in overlayView for fade in or fade out animation.
+         * If set, it will animated the res of view, otherwise or view not found will animated the overlayView
+         *
+         * @return This Builder object to allow for chaining of calls to set methods
+         */
+        public Builder setVisibilityViewRes(@IdRes int visibilityViewRes) {
+            this.visibilityViewRes = visibilityViewRes;
             return this;
         }
 

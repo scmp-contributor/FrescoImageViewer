@@ -17,6 +17,7 @@
 package com.stfalcon.frescoimageviewer;
 
 import android.content.Context;
+import android.support.annotation.IdRes;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -49,6 +50,7 @@ class ImageViewerView extends RelativeLayout
     private ViewGroup dismissContainer;
     private SwipeToDismissListener swipeDismissListener;
     private View overlayView;
+    private Integer visibilityViewRes;
 
     private SwipeDirectionDetector.Direction direction;
 
@@ -94,6 +96,10 @@ class ImageViewerView extends RelativeLayout
         if (overlayView != null) {
             dismissContainer.addView(view);
         }
+    }
+
+    public void setVisibilityViewRes(@IdRes Integer visibilityViewRes) {
+        this.visibilityViewRes = visibilityViewRes;
     }
 
     public void setImageMargin(int marginPixels) {
@@ -236,7 +242,18 @@ class ImageViewerView extends RelativeLayout
 
     private void onClick(MotionEvent event, boolean isOverlayWasClicked) {
         if (overlayView != null && !isOverlayWasClicked) {
-            AnimationUtils.animateVisibility(overlayView);
+
+            if(this.visibilityViewRes == null) {
+                AnimationUtils.animateVisibility(overlayView);
+            } else {
+                View viewForAnimate = overlayView.findViewById(this.visibilityViewRes);
+                if(viewForAnimate != null) {
+                    AnimationUtils.animateVisibility(viewForAnimate);
+                } else {
+                    AnimationUtils.animateVisibility(overlayView);
+                }
+            }
+
             super.dispatchTouchEvent(event);
         }
     }
