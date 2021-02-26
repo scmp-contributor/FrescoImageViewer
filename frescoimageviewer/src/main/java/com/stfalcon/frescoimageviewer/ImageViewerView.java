@@ -53,7 +53,7 @@ class ImageViewerView extends RelativeLayout
     private SwipeToDismissListener swipeDismissListener;
     private View overlayView;
     private Integer visibilityViewRes;
-    private SparseArray<View> customViews; // <position, customView>
+    private SparseArray<View> customViews; // <relative position, customView>
 
     private SwipeDirectionDetector.Direction direction;
 
@@ -101,6 +101,8 @@ class ImageViewerView extends RelativeLayout
             }
         }
 
+        this.customViews = newCustomViews;
+
         adapter = new ImageViewerAdapter(getContext(), newUrls, newLqUrls, customDraweeHierarchyBuilder, isCircular, blurRadius, newCustomViews);
         pager.setAdapter(adapter);
         setStartPosition(newStartPosition);
@@ -125,10 +127,6 @@ class ImageViewerView extends RelativeLayout
 
     public void setVisibilityViewRes(@IdRes Integer visibilityViewRes) {
         this.visibilityViewRes = visibilityViewRes;
-    }
-
-    public void setCustomViews(SparseArray<View> customViews) {
-        this.customViews = customViews;
     }
 
     public void setImageMargin(int marginPixels) {

@@ -78,7 +78,6 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         viewer.setOverlayView(builder.overlayView);
         viewer.setImageMargin(builder.imageMarginPixels);
         viewer.setVisibilityViewRes(builder.visibilityViewRes);
-        viewer.setCustomViews(builder.customViews);
         viewer.setPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
