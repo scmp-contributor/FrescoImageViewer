@@ -27,6 +27,7 @@ import android.support.annotation.StyleRes;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -71,11 +72,13 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
     private void createDialog() {
         viewer = new ImageViewerView(builder.context);
         viewer.setCustomDraweeHierarchyBuilder(builder.customHierarchyBuilder);
-        viewer.setUrls(builder.urls, builder.lqUrls, builder.startPosition, builder.isCircular, builder.lowResBlurRadius);
+        viewer.setUrls(builder.urls, builder.lqUrls, builder.startPosition, builder.isCircular, builder.lowResBlurRadius, builder.customViews);
         viewer.setOnDismissListener(this);
         viewer.setBackgroundColor(builder.backgroundColor);
         viewer.setOverlayView(builder.overlayView);
         viewer.setImageMargin(builder.imageMarginPixels);
+        viewer.setVisibilityViewRes(builder.visibilityViewRes);
+        viewer.setCustomViews(builder.customViews);
         viewer.setPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -84,7 +87,6 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
                 }
             }
         });
-        viewer.setVisibilityViewRes(builder.visibilityViewRes);
 
         dialog = new AlertDialog.Builder(builder.context, getDialogStyle())
                 .setView(viewer)
@@ -137,7 +139,8 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         void onDismiss();
     }
 
-    private @StyleRes int getDialogStyle() {
+    private @StyleRes
+    int getDialogStyle() {
         return builder.shouldStatusBarHide
                 ? android.R.style.Theme_Translucent_NoTitleBar_Fullscreen
                 : android.R.style.Theme_Translucent_NoTitleBar;
@@ -162,6 +165,8 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         private boolean shouldStatusBarHide = true;
         private boolean isCircular = false;
         private @IdRes Integer visibilityViewRes = null;
+        private SparseArray<View> customViews = new SparseArray<>(); // <position, customView>
+
         /**
          * Constructor using a context, images urls array and low resolution images urls array for this builder and the {@link ImageViewer} it creates.
          */
@@ -308,6 +313,16 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
          */
         public Builder setVisibilityViewRes(@IdRes int visibilityViewRes) {
             this.visibilityViewRes = visibilityViewRes;
+            return this;
+        }
+
+        /**
+         * Set the custom views with position for display the custom view between images
+         *
+         * @return This Builder object to allow for chaining of calls to set methods
+         */
+        public Builder setCustomViews(SparseArray<View> customViews) {
+            this.customViews = customViews;
             return this;
         }
 

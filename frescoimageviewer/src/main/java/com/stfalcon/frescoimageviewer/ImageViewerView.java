@@ -21,6 +21,7 @@ import android.support.annotation.IdRes;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -31,6 +32,7 @@ import android.widget.RelativeLayout;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.stfalcon.frescoimageviewer.adapter.ImageViewerAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -51,6 +53,7 @@ class ImageViewerView extends RelativeLayout
     private SwipeToDismissListener swipeDismissListener;
     private View overlayView;
     private Integer visibilityViewRes;
+    private SparseArray<View> customViews; // <position, customView>
 
     private SwipeDirectionDetector.Direction direction;
 
@@ -74,11 +77,33 @@ class ImageViewerView extends RelativeLayout
         init();
     }
 
-    public void setUrls(List<String> urls, List<String> lqUrls, int startPosition, boolean isCircular, int blurRadius) {
-        adapter = new ImageViewerAdapter(
-                getContext(), urls, lqUrls, customDraweeHierarchyBuilder, isCircular, blurRadius);
+    public void setUrls(List<String> urls, List<String> lqUrls, int startPosition, boolean isCircular, int blurRadius, SparseArray<View> customViews) {
+
+        List<String> newUrls = new ArrayList<>(urls);
+        List<String> newLqUrls = new ArrayList<>(lqUrls);
+        SparseArray<View> newCustomViews = new SparseArray<>();
+        int newStartPosition = startPosition;
+
+        for (int i = 0; i < customViews.size(); i++) {
+            // get the relative index
+            int key = customViews.keyAt(i);
+            String url = urls.get(key);
+            int index = newUrls.indexOf(url);
+
+            // add the empty into urls to make the urls size correct
+            newUrls.add(index, "");
+            newLqUrls.add(index, "");
+            newCustomViews.put(index, customViews.get(key));
+
+            // startPosition + 1 if the
+            if(key <= startPosition) {
+                newStartPosition++;
+            }
+        }
+
+        adapter = new ImageViewerAdapter(getContext(), newUrls, newLqUrls, customDraweeHierarchyBuilder, isCircular, blurRadius, newCustomViews);
         pager.setAdapter(adapter);
-        setStartPosition(startPosition);
+        setStartPosition(newStartPosition);
     }
 
     public void setCustomDraweeHierarchyBuilder(GenericDraweeHierarchyBuilder customDraweeHierarchyBuilder) {
@@ -100,6 +125,10 @@ class ImageViewerView extends RelativeLayout
 
     public void setVisibilityViewRes(@IdRes Integer visibilityViewRes) {
         this.visibilityViewRes = visibilityViewRes;
+    }
+
+    public void setCustomViews(SparseArray<View> customViews) {
+        this.customViews = customViews;
     }
 
     public void setImageMargin(int marginPixels) {
@@ -203,8 +232,34 @@ class ImageViewerView extends RelativeLayout
     public void setPageChangeListener(ViewPager.OnPageChangeListener pageChangeListener) {
         pager.removeOnPageChangeListener(this.pageChangeListener);
         this.pageChangeListener = pageChangeListener;
-        pager.addOnPageChangeListener(pageChangeListener);
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                ImageViewerView.this.pageChangeListener.onPageScrolled(position, positionOffset, positionOffsetPixels);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                hideOverlayView(position);
+                ImageViewerView.this.pageChangeListener.onPageSelected(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                ImageViewerView.this.pageChangeListener.onPageScrollStateChanged(state);
+            }
+        });
+
+        hideOverlayView(pager.getCurrentItem());
         pageChangeListener.onPageSelected(pager.getCurrentItem());
+    }
+
+    private void hideOverlayView(int position) {
+        if(customViews.get(position) == null) {
+            overlayView.setVisibility(VISIBLE);
+        } else {
+            overlayView.setVisibility(INVISIBLE);
+        }
     }
 
     private void setStartPosition(int position) {
@@ -241,7 +296,7 @@ class ImageViewerView extends RelativeLayout
     }
 
     private void onClick(MotionEvent event, boolean isOverlayWasClicked) {
-        if (overlayView != null && !isOverlayWasClicked) {
+        if (overlayView != null && !isOverlayWasClicked && customViews.get(pager.getCurrentItem()) == null) {
 
             if(this.visibilityViewRes == null) {
                 AnimationUtils.animateVisibility(overlayView);
