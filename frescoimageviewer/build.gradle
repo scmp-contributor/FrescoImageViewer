@@ -36,7 +36,6 @@ publish {
 }
 
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
     api 'com.android.support:appcompat-v7:25.0.1'
     api 'me.relex:photodraweeview:1.1.2'
     api 'jp.wasabeef:fresco-processors:2.1.0'
