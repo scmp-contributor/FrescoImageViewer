@@ -32,7 +32,6 @@ import android.widget.RelativeLayout;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.stfalcon.frescoimageviewer.adapter.ImageViewerAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -79,33 +78,11 @@ class ImageViewerView extends RelativeLayout
 
     public void setUrls(List<String> urls, List<String> lqUrls, int startPosition, boolean isCircular, int blurRadius, SparseArray<View> customViews) {
 
-        List<String> newUrls = new ArrayList<>(urls);
-        List<String> newLqUrls = new ArrayList<>(lqUrls);
-        SparseArray<View> newCustomViews = new SparseArray<>();
-        int newStartPosition = startPosition;
+        this.customViews = customViews;
 
-        for (int i = 0; i < customViews.size(); i++) {
-            // get the relative index
-            int key = customViews.keyAt(i);
-            String url = urls.get(key);
-            int index = newUrls.indexOf(url);
-
-            // add the empty into urls to make the urls size correct
-            newUrls.add(index, "");
-            newLqUrls.add(index, "");
-            newCustomViews.put(index, customViews.get(key));
-
-            // startPosition + 1 if the
-            if(key <= startPosition) {
-                newStartPosition++;
-            }
-        }
-
-        this.customViews = newCustomViews;
-
-        adapter = new ImageViewerAdapter(getContext(), newUrls, newLqUrls, customDraweeHierarchyBuilder, isCircular, blurRadius, newCustomViews);
+        adapter = new ImageViewerAdapter(getContext(), urls, lqUrls, customDraweeHierarchyBuilder, isCircular, blurRadius, customViews);
         pager.setAdapter(adapter);
-        setStartPosition(newStartPosition);
+        setStartPosition(startPosition);
     }
 
     public void setCustomDraweeHierarchyBuilder(GenericDraweeHierarchyBuilder customDraweeHierarchyBuilder) {

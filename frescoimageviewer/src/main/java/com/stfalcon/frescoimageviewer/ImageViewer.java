@@ -48,6 +48,11 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
     private AlertDialog dialog;
     private ImageViewerView viewer;
 
+    private List<String> newUrls;
+    private List<String> newLqUrls;
+    private SparseArray<View> newCustomViews;
+    private int relativeStartPosition;
+
     protected ImageViewer(Builder builder) {
         this.builder = builder;
         createDialog();
@@ -57,7 +62,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
      * Displays the built viewer if passed urls list isn't empty
      */
     public void show() {
-        if (!builder.urls.isEmpty()) {
+        if (!newUrls.isEmpty()) {
             dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimations_Fade;
             dialog.show();
         } else {
@@ -70,19 +75,49 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
     }
 
     private void createDialog() {
+
+        newUrls = new ArrayList<>(builder.urls);
+        newLqUrls = new ArrayList<>(builder.lqUrls);
+        newCustomViews = new SparseArray<>();
+        relativeStartPosition = builder.startPosition;
+
+        for (int i = 0; i < builder.customViews.size(); i++) {
+            // get the relative index
+            int key = builder.customViews.keyAt(i);
+            int index = key >= builder.urls.size() ? newUrls.size() : newUrls.indexOf(builder.urls.get(key));
+
+            // add the empty into urls to make the urls size correct
+            newUrls.add(index, "");
+            newLqUrls.add(index, "");
+            newCustomViews.put(index, builder.customViews.get(key));
+
+            // startPosition + 1 if some custom views insert before the start position
+            if (key <= builder.startPosition) {
+                relativeStartPosition++;
+            }
+        }
+
         viewer = new ImageViewerView(builder.context);
         viewer.setCustomDraweeHierarchyBuilder(builder.customHierarchyBuilder);
-        viewer.setUrls(builder.urls, builder.lqUrls, builder.startPosition, builder.isCircular, builder.lowResBlurRadius, builder.customViews);
+        viewer.setUrls(newUrls, newLqUrls, relativeStartPosition, builder.isCircular, builder.lowResBlurRadius, newCustomViews);
         viewer.setOnDismissListener(this);
         viewer.setBackgroundColor(builder.backgroundColor);
         viewer.setOverlayView(builder.overlayView);
         viewer.setImageMargin(builder.imageMarginPixels);
         viewer.setVisibilityViewRes(builder.visibilityViewRes);
+
         viewer.setPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 if (builder.imageChangeListener != null) {
-                    builder.imageChangeListener.onImageChange(position);
+                    // find the relative position
+                    int relativePosition = -1;
+                    String url = newUrls.get(position);
+                    if (url != null && !url.isEmpty()) {
+                        relativePosition = builder.urls.indexOf(url);
+                    }
+
+                    builder.imageChangeListener.onImageChange(position, relativePosition);
                 }
             }
         });
@@ -126,9 +161,12 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
 
     /**
      * Interface definition for a callback to be invoked when image was changed
+     * <p>
+     * originPosition = origin position in images
+     * position = position includes custom views
      */
     public interface OnImageChangeListener {
-        void onImageChange(int position);
+        void onImageChange(int position, int originPosition);
     }
 
     /**
@@ -153,7 +191,8 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         private Context context;
         private List<String> urls;
         private List<String> lqUrls;
-        private @ColorInt int backgroundColor = Color.BLACK;
+        private @ColorInt
+        int backgroundColor = Color.BLACK;
         private int startPosition;
         private int lowResBlurRadius = 4;
         private OnImageChangeListener imageChangeListener;
@@ -163,7 +202,8 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         private GenericDraweeHierarchyBuilder customHierarchyBuilder;
         private boolean shouldStatusBarHide = true;
         private boolean isCircular = false;
-        private @IdRes Integer visibilityViewRes = null;
+        private @IdRes
+        Integer visibilityViewRes = null;
         private SparseArray<View> customViews = new SparseArray<>(); // <position, customView>
 
         /**
