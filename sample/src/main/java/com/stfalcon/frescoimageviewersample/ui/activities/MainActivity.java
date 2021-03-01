@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 .setCustomDraweeHierarchyBuilder(getHierarchyBuilder())
                 .setOverlayView(overlayView)
                 .setCustomViews(createCustomViews())
+                .setImageBottomView(createBottomView())
                 .show();
     }
 
@@ -105,6 +106,14 @@ public class MainActivity extends AppCompatActivity {
 
         return GenericDraweeHierarchyBuilder.newInstance(getResources());
 //                .setRoundingParams(roundingParams);
+    }
+
+    private View createBottomView() {
+
+        FrameLayout f0 = new FrameLayout(this);
+        f0.setLayoutParams(new FrameLayout.LayoutParams(200, 300));
+        f0.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_dark));
+        return f0;
     }
 
     private SparseArray<View> createCustomViews() {
