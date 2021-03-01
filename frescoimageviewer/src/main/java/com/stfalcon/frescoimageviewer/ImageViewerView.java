@@ -224,6 +224,7 @@ class ImageViewerView extends RelativeLayout
             @Override
             public void onPageSelected(int position) {
                 hideOverlayView(position);
+                hideBottomView(position);
                 ImageViewerView.this.pageChangeListener.onPageSelected(position);
             }
 
@@ -242,6 +243,15 @@ class ImageViewerView extends RelativeLayout
             overlayView.setVisibility(VISIBLE);
         } else {
             overlayView.setVisibility(INVISIBLE);
+        }
+    }
+
+    private void hideBottomView(int position) {
+        // hide the bottom view if the current showing page is not a image.
+        if(customViews.get(position) == null) {
+            bottomViewContainer.setVisibility(VISIBLE);
+        } else {
+            bottomViewContainer.setVisibility(GONE);
         }
     }
 

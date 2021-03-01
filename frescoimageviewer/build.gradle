@@ -36,9 +36,9 @@ publish {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'me.relex:photodraweeview:1.1.2'
-    compile 'jp.wasabeef:fresco-processors:2.1.0'
-    provided 'com.facebook.fresco:fresco:1.1.0'
+    api fileTree(dir: 'libs', include: ['*.jar'])
+    api 'com.android.support:appcompat-v7:25.0.1'
+    api 'me.relex:photodraweeview:1.1.2'
+    api 'jp.wasabeef:fresco-processors:2.1.0'
+    compileOnly 'com.facebook.fresco:fresco:1.1.0'
 }
