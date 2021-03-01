@@ -3,7 +3,10 @@ package com.stfalcon.frescoimageviewersample.ui.activities;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.SparseArray;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.generic.RoundingParams;
@@ -65,19 +68,20 @@ public class MainActivity extends AppCompatActivity {
         new ImageViewer.Builder(MainActivity.this, posters, lqPosters)
                 .setStartPosition(startPosition)
                 //.hideStatusBar(false)
-                .isCircular(true) // default is false - no circular
+                .isCircular(false) // default is false - no circular
                 .setImageMargin(this, R.dimen.image_margin)
                 .setImageChangeListener(getImageChangeListener())
                 .setOnDismissListener(getDismissListener())
                 .setCustomDraweeHierarchyBuilder(getHierarchyBuilder())
                 .setOverlayView(overlayView)
+                .setCustomViews(createCustomViews())
                 .show();
     }
 
     private ImageViewer.OnImageChangeListener getImageChangeListener() {
         return new ImageViewer.OnImageChangeListener() {
             @Override
-            public void onImageChange(int position) {
+            public void onImageChange(int position, int originPosition) {
                 int actualPosition = position % posters.length;
                 String url = posters[actualPosition];
                 overlayView.setShareText(url);
@@ -101,5 +105,36 @@ public class MainActivity extends AppCompatActivity {
 
         return GenericDraweeHierarchyBuilder.newInstance(getResources());
 //                .setRoundingParams(roundingParams);
+    }
+
+    private SparseArray<View> createCustomViews() {
+        SparseArray<View> array = new SparseArray<>();
+
+        FrameLayout f0 = new FrameLayout(this);
+        f0.setLayoutParams(new FrameLayout.LayoutParams(200, 300));
+        f0.setBackgroundColor(getResources().getColor(android.R.color.white));
+        array.put(0, f0);
+
+        FrameLayout f1 = new FrameLayout(this);
+        f1.setLayoutParams(new FrameLayout.LayoutParams(200, 300));
+        f1.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark));
+        array.put(2, f1);
+
+        FrameLayout f2 = new FrameLayout(this);
+        f2.setLayoutParams(new FrameLayout.LayoutParams(200, 300));
+        f2.setBackgroundColor(getResources().getColor(android.R.color.holo_green_dark));
+        array.put(5, f2);
+
+        FrameLayout f9 = new FrameLayout(this);
+        f9.setLayoutParams(new FrameLayout.LayoutParams(200, 300));
+        f9.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+        array.put(9, f9);
+
+        FrameLayout f22 = new FrameLayout(this);
+        f22.setLayoutParams(new FrameLayout.LayoutParams(200, 300));
+        f22.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+        array.put(22, f22);
+
+        return array;
     }
 }
