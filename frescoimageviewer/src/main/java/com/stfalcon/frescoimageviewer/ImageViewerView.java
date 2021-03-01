@@ -17,7 +17,6 @@
 package com.stfalcon.frescoimageviewer;
 
 import android.content.Context;
-import android.support.annotation.IdRes;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -27,6 +26,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
@@ -51,7 +51,8 @@ class ImageViewerView extends RelativeLayout
     private ViewGroup dismissContainer;
     private SwipeToDismissListener swipeDismissListener;
     private View overlayView;
-    private Integer visibilityViewRes;
+    private FrameLayout bottomViewContainer;
+    private View imageBottomView;
     private SparseArray<View> customViews; // <relative position, customView>
 
     private SwipeDirectionDetector.Direction direction;
@@ -93,6 +94,8 @@ class ImageViewerView extends RelativeLayout
     public void setBackgroundColor(int color) {
         findViewById(R.id.backgroundView)
                 .setBackgroundColor(color);
+
+        bottomViewContainer.setBackgroundColor(color);
     }
 
     public void setOverlayView(View view) {
@@ -102,8 +105,10 @@ class ImageViewerView extends RelativeLayout
         }
     }
 
-    public void setVisibilityViewRes(@IdRes Integer visibilityViewRes) {
-        this.visibilityViewRes = visibilityViewRes;
+    public void setImageBottomView(View imageBottomView) {
+        this.imageBottomView = imageBottomView;
+        bottomViewContainer.removeAllViews();
+        bottomViewContainer.addView(imageBottomView);
     }
 
     public void setImageMargin(int marginPixels) {
@@ -115,6 +120,8 @@ class ImageViewerView extends RelativeLayout
 
         backgroundView = findViewById(R.id.backgroundView);
         pager = (MultiTouchViewPager) findViewById(R.id.pager);
+
+        bottomViewContainer = (FrameLayout) findViewById(R.id.bottomViewContainer);
 
         dismissContainer = (ViewGroup) findViewById(R.id.container);
         swipeDismissListener = new SwipeToDismissListener(findViewById(R.id.dismissView), this, this);
@@ -185,6 +192,7 @@ class ImageViewerView extends RelativeLayout
     public void onViewMove(float translationY, int translationLimit) {
         float alpha = 1.0f - (1.0f / translationLimit / 4) * Math.abs(translationY);
         backgroundView.setAlpha(alpha);
+        bottomViewContainer.setAlpha(alpha);
         if (overlayView != null) overlayView.setAlpha(alpha);
     }
 
@@ -272,18 +280,7 @@ class ImageViewerView extends RelativeLayout
 
     private void onClick(MotionEvent event, boolean isOverlayWasClicked) {
         if (overlayView != null && !isOverlayWasClicked && customViews.get(pager.getCurrentItem()) == null) {
-
-            if(this.visibilityViewRes == null) {
-                AnimationUtils.animateVisibility(overlayView);
-            } else {
-                View viewForAnimate = overlayView.findViewById(this.visibilityViewRes);
-                if(viewForAnimate != null) {
-                    AnimationUtils.animateVisibility(viewForAnimate);
-                } else {
-                    AnimationUtils.animateVisibility(overlayView);
-                }
-            }
-
+            AnimationUtils.animateVisibility(overlayView);
             super.dispatchTouchEvent(event);
         }
     }

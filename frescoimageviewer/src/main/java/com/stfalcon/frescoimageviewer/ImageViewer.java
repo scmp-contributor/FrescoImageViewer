@@ -22,7 +22,6 @@ import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
-import android.support.annotation.IdRes;
 import android.support.annotation.StyleRes;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -104,7 +103,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         viewer.setBackgroundColor(builder.backgroundColor);
         viewer.setOverlayView(builder.overlayView);
         viewer.setImageMargin(builder.imageMarginPixels);
-        viewer.setVisibilityViewRes(builder.visibilityViewRes);
+        viewer.setImageBottomView(builder.imageBottomView);
 
         viewer.setPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -191,8 +190,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         private Context context;
         private List<String> urls;
         private List<String> lqUrls;
-        private @ColorInt
-        int backgroundColor = Color.BLACK;
+        private @ColorInt int backgroundColor = Color.BLACK;
         private int startPosition;
         private int lowResBlurRadius = 4;
         private OnImageChangeListener imageChangeListener;
@@ -202,8 +200,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         private GenericDraweeHierarchyBuilder customHierarchyBuilder;
         private boolean shouldStatusBarHide = true;
         private boolean isCircular = false;
-        private @IdRes
-        Integer visibilityViewRes = null;
+        private View imageBottomView;
         private SparseArray<View> customViews = new SparseArray<>(); // <position, customView>
 
         /**
@@ -345,13 +342,12 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         }
 
         /**
-         * Set visibility view res in overlayView for fade in or fade out animation.
-         * If set, it will animated the res of view, otherwise or view not found will animated the overlayView
+         * Set image bottom view below of the image pager
          *
          * @return This Builder object to allow for chaining of calls to set methods
          */
-        public Builder setVisibilityViewRes(@IdRes int visibilityViewRes) {
-            this.visibilityViewRes = visibilityViewRes;
+        public Builder setImageBottomView(View imageBottomView) {
+            this.imageBottomView = imageBottomView;
             return this;
         }
 
