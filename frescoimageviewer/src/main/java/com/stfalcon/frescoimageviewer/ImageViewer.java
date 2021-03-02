@@ -110,13 +110,22 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
             public void onPageSelected(int position) {
                 if (builder.imageChangeListener != null) {
                     // find the relative position
-                    int relativePosition = -1;
+                    int imageOriginPosition = -1;
+                    int customViewOriginPosition = -1;
+
+                    // find the origin position of image and custom, return -1 if not found.
                     String url = newUrls.get(position);
                     if (url != null && !url.isEmpty()) {
-                        relativePosition = builder.urls.indexOf(url);
+                        imageOriginPosition = builder.urls.indexOf(url);
+                    } else {
+                        View customView = newCustomViews.get(position);
+                        if(customView != null) {
+                            int customViewIndex = builder.customViews.indexOfValue(customView);
+                            customViewOriginPosition = builder.customViews.keyAt(customViewIndex);
+                        }
                     }
 
-                    builder.imageChangeListener.onImageChange(position, relativePosition);
+                    builder.imageChangeListener.onImageChange(position, imageOriginPosition, customViewOriginPosition);
                 }
             }
         });
@@ -161,11 +170,13 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
     /**
      * Interface definition for a callback to be invoked when image was changed
      * <p>
-     * originPosition = origin position in images
+     *
+     * imageOriginPosition = origin position in images
+     * customViewOriginPosition = origin position in custom views
      * position = position includes custom views
      */
     public interface OnImageChangeListener {
-        void onImageChange(int position, int originPosition);
+        void onImageChange(int position, int imageOriginPosition, int customViewOriginPosition);
     }
 
     /**

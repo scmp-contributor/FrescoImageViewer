@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageViewer.OnImageChangeListener getImageChangeListener() {
         return new ImageViewer.OnImageChangeListener() {
             @Override
-            public void onImageChange(int position, int originPosition) {
+            public void onImageChange(int position, int imageOriginPosition, int customViewOriginPosition) {
                 int actualPosition = position % posters.length;
                 String url = posters[actualPosition];
                 overlayView.setShareText(url);
