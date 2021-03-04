@@ -59,10 +59,10 @@ public class ImageViewerAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         ViewHolder holder;
-        if (viewType == IMAGE_TYPE) {
-            holder = new ImageViewHolder(new ZoomableDraweeView(context));
-        } else {
+        if (viewType != IMAGE_TYPE && customViews != null && customViews.get(viewType) != null) {
             holder = new CustomViewHolder(customViews.get(viewType));
+        } else {
+            holder = new ImageViewHolder(new ZoomableDraweeView(context));
         }
         holders.add(holder);
         return holder;

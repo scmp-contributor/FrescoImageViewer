@@ -107,8 +107,10 @@ class ImageViewerView extends RelativeLayout
 
     public void setImageBottomView(View imageBottomView) {
         this.imageBottomView = imageBottomView;
-        bottomViewContainer.removeAllViews();
-        bottomViewContainer.addView(imageBottomView);
+        if(imageBottomView != null) {
+            bottomViewContainer.removeAllViews();
+            bottomViewContainer.addView(imageBottomView);
+        }
     }
 
     public void setImageMargin(int marginPixels) {
