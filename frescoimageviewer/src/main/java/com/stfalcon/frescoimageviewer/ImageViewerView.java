@@ -225,7 +225,7 @@ class ImageViewerView extends RelativeLayout
 
             @Override
             public void onPageSelected(int position) {
-                hideOverlayView(position);
+//                hideOverlayView(position);
                 hideBottomView(position);
                 ImageViewerView.this.pageChangeListener.onPageSelected(position);
             }
@@ -236,17 +236,17 @@ class ImageViewerView extends RelativeLayout
             }
         });
 
-        hideOverlayView(pager.getCurrentItem());
+//        hideOverlayView(pager.getCurrentItem());
         pageChangeListener.onPageSelected(pager.getCurrentItem());
     }
 
-    private void hideOverlayView(int position) {
-        if(customViews.get(position) == null) {
-            overlayView.setVisibility(VISIBLE);
-        } else {
-            overlayView.setVisibility(INVISIBLE);
-        }
-    }
+//    private void hideOverlayView(int position) {
+//        if(customViews.get(position) == null) {
+//            overlayView.setVisibility(VISIBLE);
+//        } else {
+//            overlayView.setVisibility(INVISIBLE);
+//        }
+//    }
 
     private void hideBottomView(int position) {
         // hide the bottom view if the current showing page is not a image.
@@ -291,7 +291,7 @@ class ImageViewerView extends RelativeLayout
     }
 
     private void onClick(MotionEvent event, boolean isOverlayWasClicked) {
-        if (overlayView != null && !isOverlayWasClicked && customViews.get(pager.getCurrentItem()) == null) {
+        if (overlayView != null && !isOverlayWasClicked /* && customViews.get(pager.getCurrentItem()) == null */) {
             AnimationUtils.animateVisibility(overlayView);
             super.dispatchTouchEvent(event);
         }
