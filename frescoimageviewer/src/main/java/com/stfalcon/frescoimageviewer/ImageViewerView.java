@@ -17,15 +17,16 @@
 package com.stfalcon.frescoimageviewer;
 
 import android.content.Context;
-import android.support.annotation.IdRes;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
@@ -50,7 +51,9 @@ class ImageViewerView extends RelativeLayout
     private ViewGroup dismissContainer;
     private SwipeToDismissListener swipeDismissListener;
     private View overlayView;
-    private Integer visibilityViewRes;
+    private FrameLayout bottomViewContainer;
+    private View imageBottomView;
+    private SparseArray<View> customViews; // <relative position, customView>
 
     private SwipeDirectionDetector.Direction direction;
 
@@ -74,9 +77,11 @@ class ImageViewerView extends RelativeLayout
         init();
     }
 
-    public void setUrls(List<String> urls, List<String> lqUrls, int startPosition, boolean isCircular, int blurRadius) {
-        adapter = new ImageViewerAdapter(
-                getContext(), urls, lqUrls, customDraweeHierarchyBuilder, isCircular, blurRadius);
+    public void setUrls(List<String> urls, List<String> lqUrls, int startPosition, boolean isCircular, int blurRadius, SparseArray<View> customViews) {
+
+        this.customViews = customViews;
+
+        adapter = new ImageViewerAdapter(getContext(), urls, lqUrls, customDraweeHierarchyBuilder, isCircular, blurRadius, customViews);
         pager.setAdapter(adapter);
         setStartPosition(startPosition);
     }
@@ -89,6 +94,8 @@ class ImageViewerView extends RelativeLayout
     public void setBackgroundColor(int color) {
         findViewById(R.id.backgroundView)
                 .setBackgroundColor(color);
+
+        bottomViewContainer.setBackgroundColor(color);
     }
 
     public void setOverlayView(View view) {
@@ -98,8 +105,12 @@ class ImageViewerView extends RelativeLayout
         }
     }
 
-    public void setVisibilityViewRes(@IdRes Integer visibilityViewRes) {
-        this.visibilityViewRes = visibilityViewRes;
+    public void setImageBottomView(View imageBottomView) {
+        this.imageBottomView = imageBottomView;
+        if(imageBottomView != null) {
+            bottomViewContainer.removeAllViews();
+            bottomViewContainer.addView(imageBottomView);
+        }
     }
 
     public void setImageMargin(int marginPixels) {
@@ -111,6 +122,8 @@ class ImageViewerView extends RelativeLayout
 
         backgroundView = findViewById(R.id.backgroundView);
         pager = (MultiTouchViewPager) findViewById(R.id.pager);
+
+        bottomViewContainer = (FrameLayout) findViewById(R.id.bottomViewContainer);
 
         dismissContainer = (ViewGroup) findViewById(R.id.container);
         swipeDismissListener = new SwipeToDismissListener(findViewById(R.id.dismissView), this, this);
@@ -181,6 +194,7 @@ class ImageViewerView extends RelativeLayout
     public void onViewMove(float translationY, int translationLimit) {
         float alpha = 1.0f - (1.0f / translationLimit / 4) * Math.abs(translationY);
         backgroundView.setAlpha(alpha);
+        bottomViewContainer.setAlpha(alpha);
         if (overlayView != null) overlayView.setAlpha(alpha);
     }
 
@@ -203,8 +217,44 @@ class ImageViewerView extends RelativeLayout
     public void setPageChangeListener(ViewPager.OnPageChangeListener pageChangeListener) {
         pager.removeOnPageChangeListener(this.pageChangeListener);
         this.pageChangeListener = pageChangeListener;
-        pager.addOnPageChangeListener(pageChangeListener);
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                ImageViewerView.this.pageChangeListener.onPageScrolled(position, positionOffset, positionOffsetPixels);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+//                hideOverlayView(position);
+                hideBottomView(position);
+                ImageViewerView.this.pageChangeListener.onPageSelected(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                ImageViewerView.this.pageChangeListener.onPageScrollStateChanged(state);
+            }
+        });
+
+//        hideOverlayView(pager.getCurrentItem());
         pageChangeListener.onPageSelected(pager.getCurrentItem());
+    }
+
+//    private void hideOverlayView(int position) {
+//        if(customViews.get(position) == null) {
+//            overlayView.setVisibility(VISIBLE);
+//        } else {
+//            overlayView.setVisibility(INVISIBLE);
+//        }
+//    }
+
+    private void hideBottomView(int position) {
+        // hide the bottom view if the current showing page is not a image.
+        if(customViews.get(position) == null) {
+            bottomViewContainer.setVisibility(VISIBLE);
+        } else {
+            bottomViewContainer.setVisibility(GONE);
+        }
     }
 
     private void setStartPosition(int position) {
@@ -241,19 +291,8 @@ class ImageViewerView extends RelativeLayout
     }
 
     private void onClick(MotionEvent event, boolean isOverlayWasClicked) {
-        if (overlayView != null && !isOverlayWasClicked) {
-
-            if(this.visibilityViewRes == null) {
-                AnimationUtils.animateVisibility(overlayView);
-            } else {
-                View viewForAnimate = overlayView.findViewById(this.visibilityViewRes);
-                if(viewForAnimate != null) {
-                    AnimationUtils.animateVisibility(viewForAnimate);
-                } else {
-                    AnimationUtils.animateVisibility(overlayView);
-                }
-            }
-
+        if (overlayView != null && !isOverlayWasClicked /* && customViews.get(pager.getCurrentItem()) == null */) {
+            AnimationUtils.animateVisibility(overlayView);
             super.dispatchTouchEvent(event);
         }
     }

@@ -3,8 +3,11 @@ package com.stfalcon.frescoimageviewer.adapter;
 import android.content.Context;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
+import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder;
@@ -25,20 +28,25 @@ import me.relex.photodraweeview.OnScaleChangeListener;
  * Created by troy379 on 07.12.16.
  */
 public class ImageViewerAdapter
-        extends RecyclingPagerAdapter<ImageViewerAdapter.ImageViewHolder> {
+        extends RecyclingPagerAdapter<ViewHolder> {
+
+    private final int IMAGE_TYPE = -10;
+    private final int CUSTOM_VIEW_TYPE = -20;
 
     private Context context;
     private List<String> urls;
     private List<String> lqUrls;
-    private HashSet<ImageViewHolder> holders;
+    private HashSet<ViewHolder> holders;
     private GenericDraweeHierarchyBuilder hierarchyBuilder;
     private boolean isCircular = false;
     private int blurRadius = 4;
+    private SparseArray<View> customViews;
 
     public ImageViewerAdapter(Context context, List<String> urls, List<String> lqUrls,
                               GenericDraweeHierarchyBuilder hierarchyBuilder,
                               boolean isCircular,
-                              int blurRadius) {
+                              int blurRadius,
+                              SparseArray<View> customViews) {
         this.context = context;
         this.urls = urls;
         this.lqUrls = lqUrls;
@@ -46,39 +54,60 @@ public class ImageViewerAdapter
         this.hierarchyBuilder = hierarchyBuilder;
         this.isCircular = isCircular;
         this.blurRadius = blurRadius;
+        this.customViews = customViews;
     }
 
     @Override
-    public ImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ImageViewHolder holder = new ImageViewHolder(new ZoomableDraweeView(context));
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        ViewHolder holder;
+        if (viewType != IMAGE_TYPE && customViews != null && customViews.get(viewType) != null) {
+
+            RelativeLayout relativeLayout = new RelativeLayout(context);
+            relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            relativeLayout.setGravity(Gravity.CENTER);
+            relativeLayout.addView(customViews.get(viewType));
+
+            holder = new CustomViewHolder(relativeLayout);
+        } else {
+            holder = new ImageViewHolder(new ZoomableDraweeView(context));
+        }
         holders.add(holder);
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(ImageViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         holder.bind(position);
     }
 
     @Override
+    public int getItemViewType(int position) {
+        if (customViews != null && customViews.get(position) != null) {
+            return position;
+        }
+        return IMAGE_TYPE;
+    }
+
+    @Override
     public int getItemCount() {
-        return urls.size() <= 1 || !isCircular ? urls.size() : 5000;
+        return (urls.size() <= 1 || !isCircular) ? urls.size() : 5000;
     }
 
 
     public boolean isScaled(int index) {
-        for (ImageViewHolder holder : holders) {
-            if (holder.position == index) {
-                return holder.isScaled;
+        for (ViewHolder holder : holders) {
+            if (holder instanceof ImageViewHolder && holder.mPosition == index) {
+                return ((ImageViewHolder) holder).isScaled;
             }
         }
         return false;
     }
 
     public void resetScale(int index) {
-        for (ImageViewHolder holder : holders) {
-            if (holder.position == index) {
-                holder.resetScale();
+        for (ViewHolder holder : holders) {
+            if (holder instanceof ImageViewHolder && holder.mPosition == index) {
+                ((ImageViewHolder) holder).resetScale();
                 break;
             }
         }
@@ -110,9 +139,20 @@ public class ImageViewerAdapter
         };
     }
 
+    class CustomViewHolder extends ViewHolder {
+
+        CustomViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        void bind(int position) {
+            super.bind(position);
+            this.mPosition = position;
+        }
+    }
+
     class ImageViewHolder extends ViewHolder implements OnScaleChangeListener {
 
-        private int position = -1;
         private ZoomableDraweeView drawee;
         private boolean isScaled;
 
@@ -122,7 +162,8 @@ public class ImageViewerAdapter
         }
 
         void bind(int position) {
-            this.position = position;
+            super.bind(position);
+            this.mPosition = position;
 
             tryToSetHierarchy();
 
