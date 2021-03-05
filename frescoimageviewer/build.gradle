@@ -25,10 +25,6 @@ android {
 
 }
 
-configurations.all { 
-    resolutionStrategy.cacheDynamicVersionsFor 5, 'minutes'
-}
-
 publish {
     groupId = 'com.github.stfalcon'
     artifactId = 'frescoimageviewer'
