@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder;
@@ -60,7 +62,13 @@ public class ImageViewerAdapter
 
         ViewHolder holder;
         if (viewType != IMAGE_TYPE && customViews != null && customViews.get(viewType) != null) {
-            holder = new CustomViewHolder(customViews.get(viewType));
+
+            RelativeLayout relativeLayout = new RelativeLayout(context);
+            relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            relativeLayout.setGravity(Gravity.CENTER);
+            relativeLayout.addView(customViews.get(viewType));
+
+            holder = new CustomViewHolder(relativeLayout);
         } else {
             holder = new ImageViewHolder(new ZoomableDraweeView(context));
         }
