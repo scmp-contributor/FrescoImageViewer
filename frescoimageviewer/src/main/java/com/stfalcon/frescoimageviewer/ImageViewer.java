@@ -22,11 +22,11 @@ import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.StyleRes;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -47,11 +47,6 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
     private AlertDialog dialog;
     private ImageViewerView viewer;
 
-    private List<String> newUrls;
-    private List<String> newLqUrls;
-    private SparseArray<View> newCustomViews;
-    private int relativeStartPosition;
-
     protected ImageViewer(Builder builder) {
         this.builder = builder;
         createDialog();
@@ -61,7 +56,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
      * Displays the built viewer if passed urls list isn't empty
      */
     public void show() {
-        if (!newUrls.isEmpty()) {
+        if (!builder.urls.isEmpty()) {
             dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimations_Fade;
             dialog.show();
         } else {
@@ -74,61 +69,22 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
     }
 
     private void createDialog() {
-
-        newUrls = new ArrayList<>(builder.urls);
-        newLqUrls = new ArrayList<>(builder.lqUrls);
-        newCustomViews = new SparseArray<>();
-        relativeStartPosition = builder.startPosition;
-
-        for (int i = 0; i < builder.customViews.size(); i++) {
-            // get the relative index
-            int key = builder.customViews.keyAt(i);
-            int index = key >= builder.urls.size() ? newUrls.size() : newUrls.indexOf(builder.urls.get(key));
-
-            // add the empty into urls to make the urls size correct
-            newUrls.add(index, "");
-            newLqUrls.add(index, "");
-            newCustomViews.put(index, builder.customViews.get(key));
-
-            // startPosition + 1 if some custom views insert before the start position
-            if (key <= builder.startPosition) {
-                relativeStartPosition++;
-            }
-        }
-
         viewer = new ImageViewerView(builder.context);
         viewer.setCustomDraweeHierarchyBuilder(builder.customHierarchyBuilder);
-        viewer.setUrls(newUrls, newLqUrls, relativeStartPosition, builder.isCircular, builder.lowResBlurRadius, newCustomViews);
+        viewer.setUrls(builder.urls, builder.lqUrls, builder.startPosition, builder.isCircular, builder.lowResBlurRadius);
         viewer.setOnDismissListener(this);
         viewer.setBackgroundColor(builder.backgroundColor);
         viewer.setOverlayView(builder.overlayView);
         viewer.setImageMargin(builder.imageMarginPixels);
-        viewer.setImageBottomView(builder.imageBottomView);
-
         viewer.setPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 if (builder.imageChangeListener != null) {
-                    // find the relative position
-                    int imageOriginPosition = -1;
-                    int customViewOriginPosition = -1;
-
-                    // find the origin position of image and custom, return -1 if not found.
-                    String url = newUrls.get(position);
-                    if (url != null && !url.isEmpty()) {
-                        imageOriginPosition = builder.urls.indexOf(url);
-                    } else {
-                        View customView = newCustomViews.get(position);
-                        if(customView != null) {
-                            int customViewIndex = builder.customViews.indexOfValue(customView);
-                            customViewOriginPosition = builder.customViews.keyAt(customViewIndex);
-                        }
-                    }
-
-                    builder.imageChangeListener.onImageChange(position, imageOriginPosition, customViewOriginPosition);
+                    builder.imageChangeListener.onImageChange(position);
                 }
             }
         });
+        viewer.setVisibilityViewRes(builder.visibilityViewRes);
 
         dialog = new AlertDialog.Builder(builder.context, getDialogStyle())
                 .setView(viewer)
@@ -169,14 +125,9 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
 
     /**
      * Interface definition for a callback to be invoked when image was changed
-     * <p>
-     *
-     * imageOriginPosition = origin position in images
-     * customViewOriginPosition = origin position in custom views
-     * position = position includes custom views
      */
     public interface OnImageChangeListener {
-        void onImageChange(int position, int imageOriginPosition, int customViewOriginPosition);
+        void onImageChange(int position);
     }
 
     /**
@@ -186,8 +137,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         void onDismiss();
     }
 
-    private @StyleRes
-    int getDialogStyle() {
+    private @StyleRes int getDialogStyle() {
         return builder.shouldStatusBarHide
                 ? android.R.style.Theme_Translucent_NoTitleBar_Fullscreen
                 : android.R.style.Theme_Translucent_NoTitleBar;
@@ -211,9 +161,7 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         private GenericDraweeHierarchyBuilder customHierarchyBuilder;
         private boolean shouldStatusBarHide = true;
         private boolean isCircular = false;
-        private View imageBottomView;
-        private SparseArray<View> customViews = new SparseArray<>(); // <position, customView>
-
+        private @IdRes Integer visibilityViewRes = null;
         /**
          * Constructor using a context, images urls array and low resolution images urls array for this builder and the {@link ImageViewer} it creates.
          */
@@ -353,22 +301,13 @@ public class ImageViewer implements OnDismissListener, DialogInterface.OnKeyList
         }
 
         /**
-         * Set image bottom view below of the image pager
+         * Set visibility view res in overlayView for fade in or fade out animation.
+         * If set, it will animated the res of view, otherwise or view not found will animated the overlayView
          *
          * @return This Builder object to allow for chaining of calls to set methods
          */
-        public Builder setImageBottomView(View imageBottomView) {
-            this.imageBottomView = imageBottomView;
-            return this;
-        }
-
-        /**
-         * Set the custom views with position for display the custom view between images
-         *
-         * @return This Builder object to allow for chaining of calls to set methods
-         */
-        public Builder setCustomViews(SparseArray<View> customViews) {
-            this.customViews = customViews;
+        public Builder setVisibilityViewRes(@IdRes int visibilityViewRes) {
+            this.visibilityViewRes = visibilityViewRes;
             return this;
         }
 

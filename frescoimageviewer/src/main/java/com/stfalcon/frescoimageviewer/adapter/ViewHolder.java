@@ -53,10 +53,6 @@ public abstract class ViewHolder {
         mIsAttached = false;
     }
 
-    void bind(int position) {
-
-    }
-
     void onRestoreInstanceState(Parcelable state) {
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
