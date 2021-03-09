@@ -251,9 +251,9 @@ class ImageViewerView extends RelativeLayout
     private void hideBottomView(int position) {
         // hide the bottom view if the current showing page is not a image.
         if(customViews.get(position) == null) {
-            bottomViewContainer.setVisibility(VISIBLE);
+            this.imageBottomView.setVisibility(VISIBLE);
         } else {
-            bottomViewContainer.setVisibility(GONE);
+            this.imageBottomView.setVisibility(INVISIBLE);
         }
     }
 
