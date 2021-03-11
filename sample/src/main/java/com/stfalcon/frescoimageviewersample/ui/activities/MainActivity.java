@@ -6,7 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.generic.RoundingParams;
@@ -110,9 +112,17 @@ public class MainActivity extends AppCompatActivity {
 
     private View createBottomView() {
 
-        FrameLayout f0 = new FrameLayout(this);
+
+        Button f0 = new Button(this);
         f0.setLayoutParams(new FrameLayout.LayoutParams(200, 300));
-        f0.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_dark));
+        f0.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+        
+        f0.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "click me", Toast.LENGTH_SHORT).show();
+            }
+        });
         return f0;
     }
 
