@@ -177,7 +177,7 @@ class ImageViewerView extends RelativeLayout
                         return pager.dispatchTouchEvent(event);
                 }
             }
-            return true;
+//            return true;
         }
         return super.dispatchTouchEvent(event);
     }
