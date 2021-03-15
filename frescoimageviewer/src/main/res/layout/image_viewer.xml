@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="bottom"
-    android:clipChildren="false"
-    android:clipToPadding="false">
+    android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/bottomViewContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" />
-
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/bottomViewContainer"
-        android:clipChildren="false"
-        android:clipToPadding="false">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <View
             android:id="@+id/backgroundView"
@@ -42,16 +32,18 @@
         <FrameLayout
             android:id="@+id/dismissView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipChildren="false">
+            android:layout_height="match_parent">
 
             <com.stfalcon.frescoimageviewer.MultiTouchViewPager
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipChildren="false" />
+                android:layout_height="match_parent" />
 
         </FrameLayout>
-    </FrameLayout>
+    </RelativeLayout>
 
-</RelativeLayout>
+    <FrameLayout
+        android:id="@+id/bottomViewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
