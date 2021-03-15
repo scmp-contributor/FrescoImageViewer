@@ -65,7 +65,6 @@ public class ImageViewerAdapter
 
             RelativeLayout relativeLayout = new RelativeLayout(context);
             relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            relativeLayout.setGravity(Gravity.CENTER);
             relativeLayout.addView(customViews.get(viewType));
             relativeLayout.setClipChildren(false);
 
