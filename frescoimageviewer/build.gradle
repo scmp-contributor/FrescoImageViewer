@@ -33,6 +33,7 @@ publish {
     licences = ['Apache-2.0']
     uploadName = 'FrescoImageViewer'
     website = 'https://github.com/stfalcon-studio/FrescoImageViewer.git'
+    userOrg = ''
 }
 
 dependencies {
